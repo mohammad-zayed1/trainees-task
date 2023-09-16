@@ -35,19 +35,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
-
-export default function StudentsTable({ students, handleClickDelete }) {
+export default function StudentsTable({
+  students,
+  handleClickDelete,
+  refresh,
+  setRefresh,
+}) {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -93,40 +86,54 @@ export default function StudentsTable({ students, handleClickDelete }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {students.map((student) => (
-            <StyledTableRow key={student._id}>
-              <StyledTableCell component="th" scope="row">
-                {student.username}
-              </StyledTableCell>
-              <StyledTableCell align="right">{student.email}</StyledTableCell>
-              <StyledTableCell align="right">
-                {student.isActive ? "active" : "disabled"}
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                <Stack
-                  direction={{ xs: "column", sm: "row-reverse" }}
-                  spacing={{ xs: 1, sm: 2, md: 4 }}
-                >
-                  <FormDialog
-                    handleClickOpen={handleClickOpen}
-                    handleClose={handleClose}
-                    open={open}
-                    stdId={student._id}
-                  />
-                  <Button
-                    style={{
-                      marginRight: "8px",
-                    }}
-                    variant="outlined"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => handleClickDelete(student._id)}
-                  >
-                    Delete
-                  </Button>
-                </Stack>{" "}
-              </StyledTableCell>
+          {students.length === 0 ? (
+            <StyledTableRow>
+              <StyledTableCell>There Are No Students Yet</StyledTableCell>
             </StyledTableRow>
-          ))}
+          ) : (
+            students
+              .filter((student) => student.role !== "admin")
+              .map((student) => (
+                <StyledTableRow key={student._id}>
+                  <StyledTableCell component="th" scope="row">
+                    {student.username}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    {student.email}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    {student.isActive ? "🟢 Yes" : "🔴 No"}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    <Stack
+                      direction={{ xs: "column", sm: "row-reverse" }}
+                      spacing={{ xs: 1, sm: 2, md: 4 }}
+                    >
+                      <FormDialog
+                        handleClickOpen={handleClickOpen}
+                        handleClose={handleClose}
+                        open={open}
+                        stdId={student._id}
+                        student={student}
+                        refresh={refresh}
+                        setRefresh={setRefresh}
+                      />
+
+                      <Button
+                        style={{
+                          marginRight: "8px",
+                        }}
+                        variant="outlined"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => handleClickDelete(student._id)}
+                      >
+                        Delete
+                      </Button>
+                    </Stack>{" "}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+          )}
         </TableBody>
       </Table>
     </TableContainer>

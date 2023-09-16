@@ -15,9 +15,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Your password is required"],
   },
+  subjects: {
+    type: Array,
+    default: [],
+  },
   isActive: {
     type: Boolean,
     default: false,
+  },
+  role: {
+    type: String,
+    default: "user",
   },
   createdAt: {
     type: Date,

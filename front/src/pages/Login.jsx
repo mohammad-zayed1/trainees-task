@@ -40,13 +40,14 @@ export default function Login() {
         { withCredentials: true }
       );
       setShow(true);
+      const { success, message, role, id } = data;
       console.log(data);
-      const { success, message } = data;
+
       if (success) {
         setError({ status: false, msg: message });
         localStorage.setItem("token", true);
         setTimeout(() => {
-          navigate("/");
+          role === "user" ? navigate(`/${id}`) : navigate("/admin");
         }, 1000);
       } else {
         setError({ status: true, msg: message });

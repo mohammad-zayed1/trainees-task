@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Subject = require("../models/subjectModel");
 const { createSecretToken } = require("../utils/SecretToken");
 const bcrypt = require("bcryptjs");
 
@@ -19,7 +20,7 @@ module.exports.Signup = async (req, res, next) => {
     console.log(token);
     res
       .status(201)
-      .json({ message: "User signed in successfully", success: true, user });
+      .json({ message: "Account Created successfully", success: true, user });
     next();
   } catch (error) {
     console.error(error);
@@ -42,11 +43,6 @@ module.exports.Login = async (req, res, next) => {
       return res.json({ message: "Incorrect password or email" });
     }
 
-    console.log(user);
-    // const isActive = await User.findOne({ email });
-    // if (!user) {
-    //   return res.json({ message: "Incorrect password or email" });
-    // }
     if (!user.isActive)
       return res.json({
         message:
@@ -57,9 +53,12 @@ module.exports.Login = async (req, res, next) => {
       withCredentials: true,
       httpOnly: false,
     });
-    res
-      .status(201)
-      .json({ message: "User logged in successfully", success: true });
+    res.status(201).json({
+      message: "User logged in successfully",
+      success: true,
+      role: user.role,
+      id: user._id,
+    });
     next();
   } catch (error) {
     console.error(error);
@@ -82,7 +81,7 @@ module.exports.updateUser = async (req, res) => {
 
     res.status(201).json("user updated successfully ");
   } catch (error) {
-    res.status(500).json({ error: "Failed to update quote" });
+    res.status(500).json({ error: "Failed to update user info" });
   }
 };
 module.exports.deleteUser = async (req, res) => {
@@ -104,5 +103,28 @@ module.exports.getUsers = async (req, res) => {
     res.status(201).json(getUsers);
   } catch (error) {
     res.status(500).json({ error: "Failed to get users" });
+  }
+};
+
+module.exports.assignSubject = async (req, res) => {
+  try {
+    const { stdId, subjectId } = req.body;
+
+    // console.log(req.body);
+
+    const sub = await Subject.findById(subjectId);
+    // console.log(sub)
+    const newSubjects = await User.findById(stdId);
+    newSubjects.subjects.push(sub);
+    // console.log(preSubjects);
+    const student = await User.findOneAndUpdate(
+      { _id: stdId },
+      { subjects: newSubjects.subjects }
+    );
+    console.log(student);
+
+    res.status(201).json({ message: "subject Added Successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to get Subjects" });
   }
 };

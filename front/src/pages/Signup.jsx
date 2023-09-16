@@ -20,8 +20,8 @@ import { Alert } from "@mui/material";
 const defaultTheme = createTheme();
 
 const validationSchema = Yup.object().shape({
-  username: Yup.string().min(8, "Too Short!").required(),
-  email: Yup.string().email("Invalid email").required("Required"),
+  username: Yup.string().min(8, "Too Short!").required("Username is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters long")
     .matches(
@@ -64,14 +64,14 @@ export default function SignUp() {
         setError({ status: false, msg: message });
         localStorage.setItem("token", true);
         setTimeout(() => {
-          navigate("/");
+          navigate("/login");
         }, 1000);
       } else {
         setError({ status: true, msg: message });
       }
     } catch (error) {
       console.log(error);
-    } 
+    }
   };
 
   return (

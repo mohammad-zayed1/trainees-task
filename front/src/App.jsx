@@ -1,14 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import Home from "./pages/user/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Admin from "./pages/admin/Admin";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-
+import { useCookies } from "react-cookie";
 function App() {
   const [students, setStudents] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+
   const [loader, setLoader] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
@@ -17,8 +19,24 @@ function App() {
       axios
         .get("http://localhost:6600/users")
         .then((response) => {
-          setLoader(true);
+          // setLoader(true);
           setStudents(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
+        .finally(setLoader(false));
+    },
+    [refresh]
+  );
+
+  useEffect(
+    function () {
+      axios
+        .get("http://localhost:6600/getSubjects")
+        .then((response) => {
+          // setLoader(true);
+          setSubjects(response.data);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -52,26 +70,11 @@ function App() {
     });
   }
 
-  // async function handleSubmitUpdate(id, values) {
-  //   try {
-  //     const data = await axios.patch(
-  //       `http://localhost:6600/updateuser/${id}`,
-  //       values
-  //     );
-  //     setRefresh(!refresh);
-
-  //     console.log("added success", data.data);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
-
-  console.log(students);
   return (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/:id" element={<Home students={students} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route
@@ -79,7 +82,10 @@ function App() {
             element={
               <Admin
                 students={students}
+                subjects={subjects}
                 handleClickDelete={handleClickDelete}
+                refresh={refresh}
+                setRefresh={setRefresh}
               />
             }
           />

@@ -18,7 +18,8 @@ module.exports.userVerification = (req, res) => {
           user: user.username,
           id: user._id,
           email: user.email,
-          isActive:user.isActive
+          isActive: user.isActive,
+          role: user.role,
         });
       else return res.json({ status: false });
     }

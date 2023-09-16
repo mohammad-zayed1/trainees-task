@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 
 // import routes
 const authRoute = require("./routes/userRouter");
+const subjectRoute = require("./routes/subjectRouter");
 
 // middlewear
 app.use(
@@ -21,8 +22,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 // use routes
-
 app.use(authRoute);
+app.use(subjectRoute);
 
 module.exports = {
   server: app,
